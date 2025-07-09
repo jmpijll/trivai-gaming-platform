@@ -1,0 +1,15 @@
+# GitHub Sponsors funding configuration
+# See https://docs.github.com/en/github/administering-a-repository/displaying-a-sponsor-button-in-your-repository
+
+# GitHub Sponsors username
+github: jmpijll
+
+# Other funding platforms
+# patreon: username
+# open_collective: username
+# ko_fi: username
+# tidelift: npm/package-name
+# community_bridge: project-name
+# liberapay: username
+# issuehunt: username
+# custom: ['https://paypal.me/username', 'https://www.buymeacoffee.com/username'] 
