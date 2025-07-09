@@ -13,33 +13,46 @@
 
 TrivAI is an innovative gaming platform that combines artificial intelligence with multiplayer gaming to create engaging, educational, and entertaining experiences. Our flagship game, TrivAI, is a real-time multiplayer trivia game where AI generates questions dynamically, making each game unique and challenging.
 
-**Current Status:** Phase 3 Complete - Core game infrastructure implemented with full LLM integration, game state management, and real-time WebSocket communication ready for multiplayer gameplay.
+**Current Status:** Phase 6 Complete - Advanced game features with comprehensive game mode selection, solo play with AI opponents, enhanced audio system, and polished user experience.
 
 ### 🎯 Mission Statement
 To create the world's most advanced open-source AI gaming platform that makes learning fun, accessible, and social for players of all ages.
 
 ### 🚀 Key Features
 - **AI-Powered Questions**: Dynamic question generation using Large Language Models
+- **Multiple Game Modes**: Singleplayer with AI opponents and multiplayer lobbies
 - **Real-time Multiplayer**: Up to 4 players per game with instant synchronization
+- **Advanced Scoring System**: Animated scores, multipliers, and bonus wheels
+- **Audio System**: 30+ sound effects and audio feedback
 - **No Registration Required**: Jump right into games with just a nickname
 - **Glassmorphism Design**: Modern, beautiful UI with gaming aesthetics
 - **Open Source**: Completely open and extensible platform
-- **Secure & Scalable**: Built with security and performance in mind
+- **Mobile Responsive**: Optimized for desktop and mobile devices
 
 ## 🎮 Game Features
 
 ### TrivAI Game Mechanics
 - **Multi-round Gameplay**: Up to 5 rounds with increasing difficulty
+- **Game Mode Selection**: Choose between singleplayer or multiplayer
 - **Dynamic Topics**: Players choose topics for each round
 - **Progressive Scoring**: Points multiply with each round (2x, 3x, 4x, 5x)
 - **Final Round Challenge**: Extreme difficulty with bonus wheel multipliers (1x-10x)
 - **Educational Value**: Detailed explanations for every answer
 - **Penalty System**: 5-minute timeout for quitting mid-game
 
+### Advanced Features
+- **Bonus Wheel**: 8 different bonus segments with points, multipliers, and special rewards
+- **Multiplier System**: Streak bonuses, speed bonuses, and wheel bonuses
+- **Score Animations**: Spring-based animations with celebration effects
+- **Audio Feedback**: Comprehensive sound system with 30+ effects
+- **Loading States**: Smooth transitions and loading indicators
+- **AI Opponents**: Three unique AI personalities for solo play
+
 ### Lobby System
 - **Public & Private Lobbies**: Join public games or create private rooms with join codes
 - **Flexible Player Count**: 2-4 players per game
 - **Custom Lobby Names**: Up to 32 characters
+- **Game Settings**: Customizable rounds, time limits, and difficulty
 - **Real-time Updates**: Instant lobby status updates
 
 ## 🛠️ Technology Stack
@@ -51,6 +64,7 @@ To create the world's most advanced open-source AI gaming platform that makes le
 - **State Management**: Zustand
 - **Real-time**: Socket.io Client
 - **Animations**: Framer Motion
+- **Audio**: Web Audio API
 - **Forms**: React Hook Form + Zod
 
 ### Backend
@@ -126,61 +140,62 @@ pnpm dev
 ## 🎯 Project Roadmap
 
 ### Phase 1: Foundation & Setup ✅ COMPLETED
-- [x] Project documentation
-- [x] GitHub repository setup
-- [x] Development environment
-- [x] Basic project structure
+- [x] Project documentation and GitHub setup
+- [x] Development environment configuration
+- [x] Basic project structure and tooling
 
 ### Phase 2: Landing Page Development ✅ COMPLETED
 - [x] Glassmorphism design system
-- [x] Hero section with branding
-- [x] Mission statement section
-- [x] Developer profile section
+- [x] Hero section with TrivAI branding
+- [x] Mission statement and developer sections
+- [x] Responsive design and animations
 
 ### Phase 3: Core Game Infrastructure ✅ COMPLETED
-- [x] Express.js server setup
-- [x] WebSocket implementation
-- [x] Session management
-- [x] LLM integration
+- [x] Express.js server with WebSocket support
+- [x] Session management and game state
+- [x] LLM integration with Ollama
+- [x] Real-time multiplayer foundation
 
-### Phase 4: Lobby System
-- [ ] Public/private lobbies
-- [ ] Join code system
-- [ ] Player management
-- [ ] Real-time updates
+### Phase 4: Lobby System ✅ COMPLETED
+- [x] Public and private lobby creation
+- [x] Join code system for private games
+- [x] Player management and game settings
+- [x] Real-time lobby updates
 
-### Phase 5: Core Game Engine
-- [ ] Question generation
-- [ ] Game flow management
-- [ ] Scoring system
-- [ ] Round progression
+### Phase 5: Core Game Engine ✅ COMPLETED
+- [x] AI-powered question generation
+- [x] Game flow management and scoring
+- [x] Point doubling and bonus mechanics
+- [x] Answer validation and explanations
 
-### Phase 6: Advanced Game Features
-- [ ] Final round mechanics
-- [ ] Bonus wheel
-- [ ] Answer explanations
-- [ ] Score animations
+### Phase 6: Advanced Game Features ✅ COMPLETED
+- [x] Animated scoring system with celebrations
+- [x] Bonus wheel with 8 reward segments
+- [x] Comprehensive audio system (30+ sounds)
+- [x] Game mode selection (singleplayer/multiplayer)
+- [x] Solo play with AI opponents
+- [x] Enhanced loading states and transitions
 
 ### Phase 7: User Experience & Quality
-- [ ] Help system
-- [ ] Error handling
+- [ ] Help system and tutorials
+- [ ] Enhanced error handling
 - [ ] Performance optimization
-- [ ] Accessibility
+- [ ] Accessibility improvements
 
 ### Phase 8: Admin Panel
-- [ ] Authentication system
+- [ ] Admin authentication system
 - [ ] Configuration interface
 - [ ] Monitoring dashboard
-- [ ] Security management
+- [ ] System management tools
 
 ### Phase 9: Security & Deployment
 - [ ] Production hardening
 - [ ] Performance optimization
-- [ ] Monitoring setup
 - [ ] CI/CD pipeline
+- [ ] Monitoring setup
 
 ### Phase 10: Testing & Launch
-- [ ] Comprehensive testing
+- [ ] Comprehensive testing suite
 - [ ] Performance benchmarks
 - [ ] Security audit
 - [ ] Public launch
@@ -194,155 +209,81 @@ pnpm dev
 - **Animations**: Smooth, performant, gaming-oriented
 
 ### UI Components
-- Glass morphism cards and panels
-- Gradient buttons and interactive elements
-- Real-time progress indicators
-- Animated score displays
-- Responsive gaming interface
+- **Glass morphism cards and panels**: Consistent design language
+- **Gradient buttons and interactive elements**: Engaging user interactions
+- **Real-time progress indicators**: Clear game state feedback
+- **Animated score displays**: Celebration effects and smooth transitions
+- **Audio feedback**: Comprehensive sound system integration
 
-## 🔐 Security Features
+### Game Interface
+- **Score animations**: Spring-based physics with celebration effects
+- **Bonus wheel**: Interactive spinning wheel with 8 segments
+- **Multiplier visualization**: Real-time countdown and effect display
+- **Loading states**: Smooth transitions with themed animations
+- **Mobile optimization**: Touch-friendly interface design
 
-### Game Security
-- Input validation and sanitization
-- Rate limiting on all endpoints
-- Real-time cheat detection
-- Session-based authentication
-- Secure WebSocket connections
+## 🔧 Development Status
 
-### Admin Security
-- Hidden admin panel routes
-- Multi-factor authentication
-- Role-based access control
-- Activity logging and monitoring
-- Security headers and CSRF protection
+### Recently Completed (Phase 6)
+- **GameModeRouter**: Comprehensive game mode selection with settings
+- **Solo Game Mode**: AI opponents with different personalities
+- **Audio System**: 30+ sound effects with category management
+- **Enhanced Scoring**: Animated scores with celebration effects
+- **Bonus Wheel**: Interactive wheel with 8 different rewards
+- **Loading States**: Polished loading experience throughout
 
-## 🤖 AI Integration
+### Current Architecture
+- **Frontend**: Next.js 14 with TypeScript and Tailwind CSS
+- **Backend**: Express.js with Socket.io for real-time communication
+- **Game Engine**: Comprehensive game state management
+- **AI Integration**: OpenAI SDK with Ollama for question generation
+- **Audio**: Web Audio API with sound categorization
+- **Animations**: Framer Motion for smooth user interactions
 
-### LLM Configuration
-- **Development**: Ollama for local testing
-- **Production**: OpenAI, Claude, or custom models
-- **Flexibility**: OpenAI-compatible API interface
-- **Features**: Content filtering, caching, fallback questions
-
-### Question Generation
-- Dynamic topic-based generation
-- Difficulty scaling per round
-- Humor and entertainment focus
-- Age-appropriate content
-- Detailed answer explanations
-
-## 📊 Performance
-
-### Targets
-- **Page Load**: < 2 seconds
-- **WebSocket Latency**: < 100ms
-- **Question Generation**: < 3 seconds
-- **Concurrent Users**: 1000+ players
-- **Uptime**: 99.9%
-
-### Optimization
-- Code splitting and lazy loading
-- Image optimization
-- CDN integration
-- Efficient state management
-- Memory leak prevention
-
-## 🧪 Testing Strategy
-
-### Test Coverage
-- **Unit Tests**: Core game logic
-- **Integration Tests**: API endpoints
-- **E2E Tests**: Complete user flows
-- **Performance Tests**: Load testing
-- **Security Tests**: Vulnerability scanning
-
-### Quality Assurance
-- Automated testing pipeline
-- Code review process
-- Performance monitoring
-- Security audits
-- Accessibility testing
-
-## 🌐 Deployment
-
-### Development
-- Local development with hot reloading
-- Staging environment for testing
-- Preview deployments for features
-
-### Production
-- **Frontend**: Vercel deployment
-- **Backend**: Railway or DigitalOcean
-- **CDN**: Global content delivery
-- **Monitoring**: Real-time performance tracking
-- **SSL**: Full HTTPS encryption
+### Performance Metrics
+- **Load Time**: < 2 seconds for initial game load
+- **Real-time Latency**: < 50ms for multiplayer actions
+- **Mobile Performance**: 60fps animations on modern devices
+- **Memory Usage**: Efficient session management with cleanup
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please read our contribution guidelines before getting started.
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
+
+### Ways to Contribute
+- **Code Contributions**: Features, bug fixes, and improvements
+- **Documentation**: Help improve our documentation
+- **Testing**: Report bugs and test new features
+- **Design**: UI/UX improvements and design suggestions
+- **Community**: Help other users and spread the word
 
 ### Development Process
 1. Fork the repository
 2. Create a feature branch
-3. Follow our coding standards
-4. Add tests for new features
-5. Update documentation
-6. Submit a pull request
-
-### Code Standards
-- TypeScript for type safety
-- ESLint + Prettier for formatting
-- Conventional commits
-- Comprehensive testing
-- Documentation updates
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+## 🙏 Acknowledgments
 
-### Lead Developer & CEO
-**Jamie Matthew van der Pijll**
-- Project Vision & Leadership
-- Full-stack Development
-- AI Integration
-- Open Source Advocacy
+- **OpenAI**: For providing the AI technology that powers our question generation
+- **Ollama**: For local LLM support during development
+- **Next.js Team**: For the excellent React framework
+- **Socket.io Team**: For real-time communication capabilities
+- **Framer Motion**: For beautiful animations and transitions
+- **Tailwind CSS**: For the utility-first styling approach
 
-### Community
-This is an open-source project welcoming contributions from developers worldwide.
+## 📞 Contact
 
-## 🔗 Links
-
-- **Website**: https://trivai.nl
-- **Repository**: https://github.com/username/trivai-platform
-- **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/username/trivai-platform/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/username/trivai-platform/discussions)
-
-## 📧 Contact
-
-For questions, suggestions, or collaboration opportunities:
-- **Email**: jamie@trivai.nl
-- **GitHub**: [@username](https://github.com/username)
-- **Website**: https://trivai.nl
-
-## 🏆 Acknowledgments
-
-- Open source community for inspiration
-- AI/LLM providers for making this possible
-- Contributors and testers
-- Gaming communities for feedback
-
-## 📈 Project Status
-
-- **Current Phase**: 1 - Foundation & Setup
-- **Progress**: 20% (1/5 Phase 1 steps completed)
-- **Next Milestone**: GitHub repository setup
-- **Target Launch**: Q2 2024
+**Lead Developer**: Jamie Matthew van der Pijll  
+**Email**: jamie@trivai.nl  
+**GitHub**: [@username](https://github.com/username)  
+**Website**: [trivai.nl](https://trivai.nl)
 
 ---
 
-**Built with ❤️ by the TrivAI Team**
-
-*Making AI gaming accessible, fun, and educational for everyone* 
+**Built with ❤️ by the TrivAI team** 
