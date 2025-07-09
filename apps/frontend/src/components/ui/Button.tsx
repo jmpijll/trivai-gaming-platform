@@ -1,60 +1,73 @@
-import { ReactNode, ButtonHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
+import React from 'react'
+import { ButtonHTMLAttributes } from 'react'
+import { useButtonSound } from '@/hooks/useAudio'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'ghost';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  className?: string;
-  loading?: boolean;
+  variant?: 'primary' | 'secondary' | 'danger' | 'success'
+  size?: 'sm' | 'md' | 'lg'
+  soundEnabled?: boolean
+  children: React.ReactNode
 }
 
-export function Button({ 
-  children, 
-  variant = 'primary', 
+export const Button: React.FC<ButtonProps> = ({
+  variant = 'primary',
   size = 'md',
-  className,
-  loading = false,
-  disabled,
-  ...props 
-}: ButtonProps) {
-  const variants = {
-    primary: 'bg-gradient-to-r from-primary-purple to-primary-blue text-white',
-    secondary: 'bg-gradient-to-r from-gray-600 to-gray-700 text-white',
-    success: 'bg-gradient-to-r from-primary-green to-emerald-600 text-white',
-    danger: 'bg-gradient-to-r from-primary-red to-red-600 text-white',
-    warning: 'bg-gradient-to-r from-primary-orange to-orange-600 text-white',
-    ghost: 'bg-transparent border-2 border-white/20 text-white hover:bg-white/10'
-  };
+  soundEnabled = true,
+  children,
+  onClick,
+  onMouseEnter,
+  className = '',
+  disabled = false,
+  ...props
+}) => {
+  const { onClickSound, onHoverSound } = useButtonSound()
 
-  const sizes = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
-    lg: 'px-8 py-4 text-lg',
-    xl: 'px-10 py-5 text-xl'
-  };
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (soundEnabled && !disabled) {
+      onClickSound()
+    }
+    if (onClick) {
+      onClick(e)
+    }
+  }
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (soundEnabled && !disabled) {
+      onHoverSound()
+    }
+    if (onMouseEnter) {
+      onMouseEnter(e)
+    }
+  }
+
+  const baseClasses = 'glass-button font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2'
+  
+  const variantClasses = {
+    primary: 'bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 focus:ring-purple-500',
+    secondary: 'bg-gradient-to-r from-neutral-600 to-neutral-700 text-white hover:from-neutral-700 hover:to-neutral-800 focus:ring-neutral-500',
+    danger: 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 focus:ring-red-500',
+    success: 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 focus:ring-green-500'
+  }
+
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
+  }
+
+  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105 active:scale-95'
 
   return (
     <button
-      className={cn(
-        'glass-button font-medium transition-all duration-200 focus-ring',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        'hover:scale-105 active:scale-95',
-        variants[variant],
-        sizes[size],
-        className
-      )}
-      disabled={disabled || loading}
+      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabledClasses} ${className}`}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      disabled={disabled}
       {...props}
     >
-      {loading ? (
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          {children}
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </button>
-  );
-} 
+  )
+}
+
+export default Button 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Question, GameState } from '@/../../packages/shared/src/types/game'
+import { useGameSounds } from '@/hooks/useAudio'
 
 interface QuestionDisplayProps {
   question: Question
@@ -20,6 +21,33 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
   gameState
 }) => {
   const [localSelectedAnswer, setLocalSelectedAnswer] = useState<number | null>(null)
+  const [previousQuestion, setPreviousQuestion] = useState<Question | null>(null)
+  const [lastWarningTime, setLastWarningTime] = useState<number | null>(null)
+  
+  const { 
+    handleNewQuestion, 
+    handleTimeWarning, 
+    playSound,
+    playButtonClick 
+  } = useGameSounds()
+
+  // Play sound when new question appears
+  useEffect(() => {
+    if (question && (!previousQuestion || previousQuestion.id !== question.id)) {
+      handleNewQuestion()
+      setPreviousQuestion(question)
+    }
+  }, [question, previousQuestion, handleNewQuestion])
+
+  // Play timer warning sounds
+  useEffect(() => {
+    if (timeRemaining <= 10 && timeRemaining > 0) {
+      if (lastWarningTime === null || timeRemaining < lastWarningTime - 2) {
+        handleTimeWarning(timeRemaining)
+        setLastWarningTime(timeRemaining)
+      }
+    }
+  }, [timeRemaining, lastWarningTime, handleTimeWarning])
 
   useEffect(() => {
     setLocalSelectedAnswer(selectedAnswer)
@@ -27,6 +55,9 @@ export const QuestionDisplay: React.FC<QuestionDisplayProps> = ({
 
   const handleAnswerClick = (index: number) => {
     if (hasSubmitted || timeRemaining <= 0) return
+    
+    // Play button click sound
+    playButtonClick()
     
     setLocalSelectedAnswer(index)
     onSubmitAnswer(index)

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { motion, useAnimationControls, useSpring, useTransform } from 'framer-motion'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { useGameSounds } from '@/hooks/useAudio'
 
 interface BonusReward {
   id: string
@@ -45,6 +46,9 @@ export const BonusWheel: React.FC<BonusWheelProps> = ({
   const celebrationControls = useAnimationControls()
   const pointerControls = useAnimationControls()
   
+  // Audio system
+  const { handleWheelSpin, handleWheelStop, handleBonusEarned, handleConfetti } = useGameSounds()
+  
   // Spring animation for smooth rotation
   const springRotation = useSpring(currentRotation, {
     stiffness: 50,
@@ -63,6 +67,9 @@ export const BonusWheel: React.FC<BonusWheelProps> = ({
     setIsSpinning(true)
     setWinningSegment(null)
     setShowCelebration(false)
+    
+    // Start wheel spinning sound
+    handleWheelSpin()
     
     // Animate pointer wobble
     pointerControls.start({
@@ -91,11 +98,22 @@ export const BonusWheel: React.FC<BonusWheelProps> = ({
       }
     })
     
+    // Stop wheel spinning sound
+    handleWheelStop()
+    
     // Update state after spin
     setCurrentRotation(finalRotation % 360)
     setWinningSegment(winningReward)
     setIsSpinning(false)
     setShowCelebration(true)
+    
+    // Play reward sound effects
+    handleBonusEarned()
+    
+    // Add confetti sound for big rewards
+    if (winningReward.value >= 250) {
+      handleConfetti()
+    }
     
     // Trigger celebration animation
     celebrationControls.start({
@@ -113,7 +131,7 @@ export const BonusWheel: React.FC<BonusWheelProps> = ({
     
     // Call reward callback
     onRewardWon(winningReward)
-  }, [isSpinning, disabled, spinsRemaining, currentRotation, wheelControls, celebrationControls, pointerControls, onRewardWon])
+  }, [isSpinning, disabled, spinsRemaining, currentRotation, wheelControls, celebrationControls, pointerControls, onRewardWon, handleWheelSpin, handleWheelStop, handleBonusEarned, handleConfetti])
   
   // Render wheel segments
   const renderSegments = () => {

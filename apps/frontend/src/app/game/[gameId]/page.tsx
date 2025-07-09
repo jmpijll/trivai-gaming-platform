@@ -11,6 +11,7 @@ import { GameComplete } from '@/components/game/GameComplete'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { io, Socket } from 'socket.io-client'
 import { GameState, RoundState, Question, PlayerScore } from '@/../../packages/shared/src/types/game'
+import { useGameSounds } from '@/hooks/useAudio'
 
 type GamePhase = 'loading' | 'topic-selection' | 'question' | 'round-complete' | 'game-complete' | 'error'
 
@@ -34,6 +35,16 @@ export default function GamePage() {
   const [roundSummary, setRoundSummary] = useState<any>(null)
   const [gameStats, setGameStats] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Audio system
+  const { 
+    handleCorrectAnswer, 
+    handleWrongAnswer, 
+    handleRoundComplete, 
+    handleGameWon, 
+    handleFinalRound,
+    playSound 
+  } = useGameSounds()
 
   // Initialize socket connection
   useEffect(() => {
@@ -97,6 +108,13 @@ export default function GamePage() {
     newSocket.on('answer-submitted', (data: { playerId: string; isCorrect: boolean; gameId: string }) => {
       if (data.gameId === gameId) {
         console.log(`Player ${data.playerId} submitted answer: ${data.isCorrect ? 'correct' : 'incorrect'}`)
+        
+        // Play audio feedback based on answer correctness
+        if (data.isCorrect) {
+          handleCorrectAnswer()
+        } else {
+          handleWrongAnswer()
+        }
       }
     })
 
@@ -123,6 +141,8 @@ export default function GamePage() {
           setCurrentPhase('game-complete')
         } else {
           setCurrentPhase('round-complete')
+          // Play round complete sound
+          handleRoundComplete()
         }
       }
     })
@@ -132,6 +152,8 @@ export default function GamePage() {
         setGameStats(data.stats)
         setGameState(prev => prev ? { ...prev, scores: data.finalScores } : null)
         setCurrentPhase('game-complete')
+        // Play game won sound
+        handleGameWon()
       }
     })
 
