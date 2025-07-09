@@ -232,6 +232,15 @@ export class SessionStore {
     return lobby;
   }
 
+  updateLobby(lobbyId: string, updates: Partial<Lobby>): Lobby | undefined {
+    const lobby = this.lobbies.get(lobbyId);
+    if (!lobby) return undefined;
+
+    const updatedLobby = { ...lobby, ...updates, lastActivity: new Date() };
+    this.lobbies.set(lobbyId, updatedLobby);
+    return updatedLobby;
+  }
+
   deleteLobby(lobbyId: string): void {
     const lobby = this.lobbies.get(lobbyId);
     if (lobby) {

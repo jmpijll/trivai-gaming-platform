@@ -14,7 +14,6 @@
     "setup": "echo 'Backend setup complete'"
   },
   "dependencies": {
-    "shared": "workspace:*",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -24,7 +23,8 @@
     "express-session": "^1.17.3",
     "helmet": "^7.1.0",
     "joi": "^17.11.0",
-    "openai": "^4.20.1",
+    "openai": "^4.104.0",
+    "shared": "workspace:*",
     "socket.io": "^4.7.4",
     "speakeasy": "^2.0.0",
     "uuid": "^9.0.1",
