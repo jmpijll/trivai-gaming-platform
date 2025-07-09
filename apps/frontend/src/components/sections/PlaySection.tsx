@@ -3,8 +3,15 @@
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Container } from '@/components/ui/Container';
+import { useRouter } from 'next/navigation';
 
 export function PlaySection() {
+  const router = useRouter();
+
+  const handleNavigateToLobby = () => {
+    router.push('/lobby');
+  };
+
   return (
     <section id="play" className="py-20 relative overflow-hidden">
       <Container>
@@ -28,24 +35,26 @@ export function PlaySection() {
                 <Button 
                   size="lg" 
                   className="text-lg px-8 py-4 hover:scale-105 transition-transform duration-200"
+                  onClick={handleNavigateToLobby}
                 >
-                  🚀 Start New Game
+                  🚀 Create Lobby
                 </Button>
                 <Button 
                   variant="secondary" 
                   size="lg" 
                   className="text-lg px-8 py-4 hover:scale-105 transition-transform duration-200"
+                  onClick={handleNavigateToLobby}
                 >
-                  🎮 Join Game
+                  🎮 Join Lobby
                 </Button>
               </div>
 
               <div className="text-sm text-gray-500 opacity-100">
                 <p className="mb-2">
-                  🔗 Game lobby system coming in Phase 3
+                  🎯 Phase 4: Lobby System - In Progress
                 </p>
                 <p>
-                  Currently in Phase 3: Core Game Infrastructure Complete ✅
+                  Phase 3: Core Game Infrastructure Complete ✅
                 </p>
               </div>
             </Card>

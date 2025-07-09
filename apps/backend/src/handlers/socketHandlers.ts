@@ -9,6 +9,7 @@ interface ClientToServerEvents {
   'join-lobby': (data: { lobbyId: string; joinCode?: string; nickname: string }) => void;
   'leave-lobby': (data: { lobbyId: string }) => void;
   'toggle-ready': (data: { lobbyId: string }) => void;
+  'update-game-settings': (data: { lobbyId: string; settings: any }) => void;
   'start-game': (data: { lobbyId: string }) => void;
   
   // Game events
@@ -362,6 +363,48 @@ export function setupSocketHandlers(io: Server) {
       } catch (error) {
         console.error('Error toggling ready:', error);
         socket.emit('lobby-error', { message: 'Failed to toggle ready status' });
+      }
+    });
+
+    socket.on('update-game-settings', async (data) => {
+      try {
+        const { lobbyId, settings } = data;
+        
+        if (!socket.playerId) {
+          socket.emit('lobby-error', { message: 'Player not found' });
+          return;
+        }
+
+        const lobby = sessionStore.getLobby(lobbyId);
+        if (!lobby) {
+          socket.emit('lobby-error', { message: 'Lobby not found' });
+          return;
+        }
+
+        // Check if player is lobby owner
+        if (lobby.ownerId !== socket.playerId) {
+          socket.emit('lobby-error', { message: 'Only lobby owner can update game settings' });
+          return;
+        }
+
+        // Update lobby with new game settings
+        const updatedLobby = sessionStore.updateLobby(lobbyId, { 
+          ...lobby, 
+          gameSettings: settings 
+        });
+
+        if (!updatedLobby) {
+          socket.emit('lobby-error', { message: 'Failed to update game settings' });
+          return;
+        }
+
+        // Notify all players in the lobby
+        io.to(lobbyId).emit('lobby-updated', { lobby: updatedLobby });
+        
+        console.log(`Game settings updated in lobby: ${lobbyId}`);
+      } catch (error) {
+        console.error('Error updating game settings:', error);
+        socket.emit('lobby-error', { message: 'Failed to update game settings' });
       }
     });
 
