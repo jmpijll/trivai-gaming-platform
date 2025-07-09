@@ -186,8 +186,8 @@ export class GameService {
     // Determine difficulty based on round number
     const difficulty = this.getDifficultyForRound(game.currentRound, game.totalRounds);
     
-    // Generate questions for this round
-    const questions = await llmService.generateQuestions({
+    // Generate questions for this round with validation and filtering
+    const questions = await llmService.generateValidatedQuestions({
       topic,
       difficulty,
       count: game.settings.questionsPerRound,

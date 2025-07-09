@@ -263,6 +263,239 @@ REQUIREMENTS:
   }
 
   /**
+   * Validate answer correctness using LLM
+   */
+  async validateAnswer(question: Question, answerIndex: number): Promise<{
+    isCorrect: boolean;
+    confidence: number;
+    explanation: string;
+  }> {
+    try {
+      const answer = question.answers[answerIndex];
+      if (!answer) {
+        return {
+          isCorrect: false,
+          confidence: 1.0,
+          explanation: 'Invalid answer index provided.'
+        };
+      }
+
+      const prompt = `Validate if this answer is correct for the given question:
+
+QUESTION: ${question.text}
+GIVEN ANSWER: ${answer.text}
+TOPIC: ${question.topic}
+
+Please evaluate if the given answer is factually correct and appropriate for the question. 
+Return your response as JSON with:
+- isCorrect: boolean
+- confidence: number (0.0 to 1.0)
+- explanation: string explaining your reasoning
+
+Be strict about factual accuracy. If there's any doubt, mark as incorrect.`;
+
+      const completion = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a fact-checking expert. Validate answers with high accuracy and provide confidence scores.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.1, // Low temperature for consistent validation
+        max_tokens: 500,
+        response_format: { type: 'json_object' }
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      if (!response) {
+        throw new Error('No validation response from LLM');
+      }
+
+      const validation = JSON.parse(response);
+      
+      return {
+        isCorrect: validation.isCorrect || false,
+        confidence: Math.max(0, Math.min(1, validation.confidence || 0)),
+        explanation: validation.explanation || 'No explanation provided.'
+      };
+    } catch (error) {
+      console.error('Error validating answer:', error);
+      // Fallback to stored correct answer
+      return {
+        isCorrect: answerIndex === question.correctAnswerIndex,
+        confidence: 0.5,
+        explanation: 'Validation service temporarily unavailable. Using stored answer.'
+      };
+    }
+  }
+
+  /**
+   * Filter content for appropriateness
+   */
+  async filterContent(text: string, context: string = 'trivia'): Promise<{
+    isAppropriate: boolean;
+    reasons: string[];
+    filteredText?: string;
+  }> {
+    try {
+      const prompt = `Analyze this content for appropriateness in a family-friendly trivia game:
+
+CONTENT: "${text}"
+CONTEXT: ${context}
+
+Check for:
+- Offensive language or slurs
+- Inappropriate sexual content
+- Excessive violence or gore
+- Discriminatory content
+- Misleading or false information
+- Content unsuitable for ages 13+
+
+Return JSON with:
+- isAppropriate: boolean
+- reasons: array of strings explaining any issues
+- filteredText: optional cleaned version if fixable
+
+Be moderately strict - err on the side of caution for family gaming.`;
+
+      const completion = await this.client.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a content moderation specialist for family-friendly gaming platforms.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 300,
+        response_format: { type: 'json_object' }
+      });
+
+      const response = completion.choices[0]?.message?.content;
+      if (!response) {
+        throw new Error('No content filtering response from LLM');
+      }
+
+      const filter = JSON.parse(response);
+      
+      return {
+        isAppropriate: filter.isAppropriate !== false, // Default to true if unclear
+        reasons: Array.isArray(filter.reasons) ? filter.reasons : [],
+        filteredText: filter.filteredText
+      };
+    } catch (error) {
+      console.error('Error filtering content:', error);
+      // Fallback to basic word filtering
+      return this.basicContentFilter(text);
+    }
+  }
+
+  /**
+   * Basic content filtering fallback
+   */
+  private basicContentFilter(text: string): {
+    isAppropriate: boolean;
+    reasons: string[];
+    filteredText?: string;
+  } {
+    const inappropriateWords = [
+      'fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard',
+      'nazi', 'hitler', 'kill', 'murder', 'suicide', 'rape',
+      'sex', 'porn', 'nude', 'naked'
+    ];
+
+    const lowerText = text.toLowerCase();
+    const foundWords = inappropriateWords.filter(word => 
+      lowerText.includes(word.toLowerCase())
+    );
+
+    if (foundWords.length > 0) {
+      return {
+        isAppropriate: false,
+        reasons: [`Contains inappropriate language: ${foundWords.join(', ')}`],
+        filteredText: undefined
+      };
+    }
+
+    return {
+      isAppropriate: true,
+      reasons: [],
+      filteredText: undefined
+    };
+  }
+
+  /**
+   * Enhanced question generation with validation and filtering
+   */
+  async generateValidatedQuestions(options: QuestionGenerationOptions): Promise<Question[]> {
+    const questions = await this.generateQuestions(options);
+    const validatedQuestions: Question[] = [];
+
+    for (const question of questions) {
+      try {
+        // Filter question content
+        const questionFilter = await this.filterContent(question.text, `${options.topic} trivia question`);
+        if (!questionFilter.isAppropriate) {
+          console.warn(`Question filtered out: ${questionFilter.reasons.join(', ')}`);
+          continue;
+        }
+
+        // Filter answer content
+        let allAnswersAppropriate = true;
+        const filteredAnswers = [];
+
+        for (const answer of question.answers) {
+          const answerFilter = await this.filterContent(answer.text, `${options.topic} trivia answer`);
+          if (!answerFilter.isAppropriate) {
+            console.warn(`Answer filtered out: ${answerFilter.reasons.join(', ')}`);
+            allAnswersAppropriate = false;
+            break;
+          }
+          filteredAnswers.push(answer);
+        }
+
+        if (!allAnswersAppropriate) {
+          continue;
+        }
+
+        // Validate the correct answer
+        const validation = await this.validateAnswer(question, question.correctAnswerIndex);
+        if (!validation.isCorrect || validation.confidence < 0.7) {
+          console.warn(`Question validation failed: ${validation.explanation}`);
+          continue;
+        }
+
+        validatedQuestions.push(question);
+      } catch (error) {
+        console.error(`Error validating question: ${error}`);
+        // Include question anyway if validation fails
+        validatedQuestions.push(question);
+      }
+    }
+
+    // If we don't have enough validated questions, fill with fallbacks
+    if (validatedQuestions.length < options.count) {
+      const fallbacks = this.getFallbackQuestions(
+        options.topic, 
+        options.difficulty, 
+        options.count - validatedQuestions.length
+      );
+      validatedQuestions.push(...fallbacks);
+    }
+
+    return validatedQuestions.slice(0, options.count);
+  }
+
+  /**
    * Generate topics for topic selection
    */
   async generateTopics(count: number = 10): Promise<string[]> {
