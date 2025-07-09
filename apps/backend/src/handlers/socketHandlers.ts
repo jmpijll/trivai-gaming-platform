@@ -18,6 +18,9 @@ interface ClientToServerEvents {
   'request-next-question': (data: { gameId: string }) => void;
   'quit-game': (data: { gameId: string }) => void;
   'get-game-state': (data: { gameId: string }) => void;
+  'activate-point-doubling': (data: { gameId: string }) => void;
+  'spin-bonus-wheel': (data: { gameId: string }) => void;
+  'get-answer-explanation': (data: { gameId: string; questionIndex: number }) => void;
   
   // Testing events
   'test-llm': () => void;
@@ -46,6 +49,9 @@ interface ServerToClientEvents {
   'round-ended': (data: { summary: any; gameId: string; isGameComplete: boolean }) => void;
   'game-completed': (data: { stats: any; finalScores: any[]; gameId: string }) => void;
   'game-state-updated': (data: { game: GameState }) => void;
+  'point-doubling-activated': (data: { gameId: string; playerId: string; game: GameState }) => void;
+  'bonus-wheel-result': (data: { gameId: string; playerId: string; result: any; game: GameState }) => void;
+  'answer-explanation': (data: { gameId: string; questionIndex: number; explanation: any }) => void;
   
   // Testing events
   'llm-test-result': (data: { success: boolean; message: string }) => void;
@@ -642,6 +648,103 @@ export function setupSocketHandlers(io: Server) {
       } catch (error) {
         console.error('Error quitting game:', error);
         socket.emit('game-error', { message: 'Failed to quit game' });
+      }
+    });
+
+    socket.on('activate-point-doubling', async (data) => {
+      try {
+        const { gameId } = data;
+        
+        if (!socket.playerId || socket.gameId !== gameId) {
+          socket.emit('game-error', { message: 'Invalid game access' });
+          return;
+        }
+
+        const success = gameService.activatePointDoubling(gameId, socket.playerId);
+        if (success) {
+          const game = gameService.getGame(gameId);
+          if (game) {
+            io.to(gameId).emit('point-doubling-activated', { 
+              gameId, 
+              playerId: socket.playerId, 
+              game 
+            });
+          }
+        } else {
+          socket.emit('game-error', { 
+            message: 'Cannot activate point doubling - already used this round or limit reached', 
+            gameId 
+          });
+        }
+
+        console.log(`Player ${socket.playerId} activated point doubling in game ${gameId}`);
+      } catch (error) {
+        console.error('Error activating point doubling:', error);
+        socket.emit('game-error', { message: 'Failed to activate point doubling' });
+      }
+    });
+
+    socket.on('spin-bonus-wheel', async (data) => {
+      try {
+        const { gameId } = data;
+        
+        if (!socket.playerId || socket.gameId !== gameId) {
+          socket.emit('game-error', { message: 'Invalid game access' });
+          return;
+        }
+
+        const result = gameService.spinBonusWheel(gameId, socket.playerId);
+        if (result) {
+          const game = gameService.getGame(gameId);
+          if (game) {
+            io.to(gameId).emit('bonus-wheel-result', { 
+              gameId, 
+              playerId: socket.playerId, 
+              result,
+              game 
+            });
+          }
+        } else {
+          socket.emit('game-error', { 
+            message: 'Cannot spin bonus wheel - not available or already used', 
+            gameId 
+          });
+        }
+
+        console.log(`Player ${socket.playerId} spun bonus wheel in game ${gameId}: ${result?.message}`);
+      } catch (error) {
+        console.error('Error spinning bonus wheel:', error);
+        socket.emit('game-error', { message: 'Failed to spin bonus wheel' });
+      }
+    });
+
+    socket.on('get-answer-explanation', async (data) => {
+      try {
+        const { gameId, questionIndex } = data;
+        
+        if (!socket.playerId || socket.gameId !== gameId) {
+          socket.emit('game-error', { message: 'Invalid game access' });
+          return;
+        }
+
+        const explanation = gameService.getAnswerExplanation(gameId, questionIndex);
+        if (explanation) {
+          socket.emit('answer-explanation', { 
+            gameId, 
+            questionIndex, 
+            explanation 
+          });
+        } else {
+          socket.emit('game-error', { 
+            message: 'Explanation not available for this question', 
+            gameId 
+          });
+        }
+
+        console.log(`Player ${socket.playerId} requested explanation for question ${questionIndex} in game ${gameId}`);
+      } catch (error) {
+        console.error('Error getting answer explanation:', error);
+        socket.emit('game-error', { message: 'Failed to get answer explanation' });
       }
     });
 
