@@ -548,6 +548,6 @@ Be moderately strict - err on the side of caution for family gaming.`;
 // Export singleton instance
 export const llmService = new LLMService({
   apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.LLM_BASE_URL || process.env.OLLAMA_BASE_URL,
-  model: process.env.LLM_MODEL || 'llama2'
+  baseURL: process.env.LLM_BASE_URL || process.env.OLLAMA_BASE_URL || 'http://172.27.1.86:11434/v1',
+  model: process.env.LLM_MODEL || 'gemma3:4b'
 }); 

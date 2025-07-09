@@ -208,7 +208,10 @@ export default function LobbyPage() {
                   {currentPlayer?.id === currentLobby.ownerId && (
                     <Button
                       onClick={handleStartGame}
-                      disabled={!currentLobby.players.every(p => p.isReady) || currentLobby.players.length < 2}
+                      disabled={
+                        currentLobby.players.length < 1 ||
+                        (currentLobby.players.length > 1 && !currentLobby.players.every(p => p.isReady))
+                      }
                       className="w-full glass-button"
                     >
                       Start Game

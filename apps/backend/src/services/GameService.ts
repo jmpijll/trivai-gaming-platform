@@ -529,19 +529,13 @@ export class GameService {
       return { shouldEnd: true, reason: 'All players disconnected' };
     }
 
-    // Check if only one player remains
-    if (activePlayers === 1) {
-      const winner = game.scores.find(s => s.isActive)?.nickname || 'Unknown';
-      return { shouldEnd: true, reason: 'Only one player remaining', winner };
-    }
-
     // Check if maximum rounds reached
     if (game.currentRound >= game.totalRounds && game.roundState?.isComplete) {
       const topPlayer = this.getTopPlayer(game.scores);
       return { shouldEnd: true, reason: 'Maximum rounds completed', winner: topPlayer };
     }
 
-    // Check if there's a decisive leader (50% more points than second place)
+    // For multiplayer games, check if there's a decisive leader (50% more points than second place)
     const sortedScores = [...game.scores].sort((a, b) => b.totalScore - a.totalScore);
     if (sortedScores.length >= 2 && sortedScores[0].totalScore > sortedScores[1].totalScore * 1.5) {
       const leadMargin = sortedScores[0].totalScore - sortedScores[1].totalScore;
@@ -569,9 +563,9 @@ export class GameService {
       playerScore.isActive = false;
     }
 
-    // Check if game should be cancelled
+    // Check if game should be cancelled (allow single player games)
     const activePlayers = game.scores.filter(s => s.isActive).length;
-    if (activePlayers < 2) {
+    if (activePlayers < 1) {
       game.gameStatus = GameStatus.CANCELLED;
       this.clearQuestionTimer(gameId);
     }

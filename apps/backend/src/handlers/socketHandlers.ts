@@ -436,16 +436,16 @@ export function setupSocketHandlers(io: Server) {
           return;
         }
 
-        // Check if all players are ready
+        // Check if all players are ready (allow singleplayer without ready requirement)
         const allReady = lobby.players.every((player: any) => player.isReady);
-        if (!allReady) {
+        if (!allReady && lobby.players.length > 1) {
           socket.emit('lobby-error', { message: 'All players must be ready to start' });
           return;
         }
 
-        // Check minimum players
-        if (lobby.players.length < 2) {
-          socket.emit('lobby-error', { message: 'Need at least 2 players to start' });
+        // Check minimum players (allow single player for testing)
+        if (lobby.players.length < 1) {
+          socket.emit('lobby-error', { message: 'Need at least 1 player to start' });
           return;
         }
 
@@ -606,15 +606,29 @@ export function setupSocketHandlers(io: Server) {
       try {
         const { gameId } = data;
         
-        if (!socket.playerId) {
-          socket.emit('game-error', { message: 'Player not found' });
-          return;
-        }
-
         const game = gameService.getGame(gameId);
         if (!game) {
           socket.emit('game-error', { message: 'Game not found', gameId });
           return;
+        }
+
+        // If no playerId is set, try to restore it from session store
+        if (!socket.playerId) {
+          const player = sessionStore.getPlayerBySession(socket.id);
+          if (player) {
+            socket.playerId = player.id;
+          } else {
+            // For direct game page navigation, create a temporary player session
+            // This handles cases where the user refreshes the game page
+            socket.emit('game-error', { message: 'Session expired. Please return to lobby.' });
+            return;
+          }
+        }
+
+        // Join the game room if not already joined
+        if (!socket.rooms.has(gameId)) {
+          socket.join(gameId);
+          socket.gameId = gameId;
         }
 
         socket.emit('game-state-updated', { game });
