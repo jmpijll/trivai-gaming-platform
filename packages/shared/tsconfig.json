@@ -20,7 +20,8 @@
     "types": ["node", "jest"],
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmit": false
   },
   "include": [
     "src/**/*"

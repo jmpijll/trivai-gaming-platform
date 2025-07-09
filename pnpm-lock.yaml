@@ -59,6 +59,9 @@ importers:
       openai:
         specifier: ^4.20.1
         version: 4.104.0
+      shared:
+        specifier: workspace:*
+        version: link:../../packages/shared
       socket.io:
         specifier: ^4.7.4
         version: 4.8.1
@@ -91,7 +94,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.10
       '@types/uuid':
-        specifier: ^9.0.7
+        specifier: ^9.0.8
         version: 9.0.8
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.15.0

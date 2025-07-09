@@ -13,6 +13,22 @@ export enum DifficultyLevel {
   EXTREME = 'extreme',
 }
 
+export interface Question {
+  id: string;
+  text: string;
+  answers: Answer[];
+  correctAnswerIndex: number;
+  explanation: string;
+  difficulty: DifficultyLevel;
+  topic: string;
+  timeLimit: number;
+}
+
+export interface Answer {
+  text: string;
+  isCorrect: boolean;
+}
+
 export interface GameSettings {
   maxRounds: number;
   questionsPerRound: number;

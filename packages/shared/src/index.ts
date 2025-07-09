@@ -1,8 +1,12 @@
-// Export all shared types and interfaces
+// Game types
 export * from './types/game';
+
+// Lobby types  
 export * from './types/lobby';
-export * from './types/player';
-export * from './types/question';
+
+// WebSocket types
 export * from './types/websocket';
-export * from './types/admin';
+
+// API types
+export * from './types/api';
 export * from './schemas'; 

@@ -80,12 +80,16 @@ export interface PlayerUpdateRequest {
   isReady?: boolean;
 }
 
+export interface PlayerConstraints {
+  NICKNAME_MIN_LENGTH: number;
+  NICKNAME_MAX_LENGTH: number;
+  NICKNAME_REGEX: RegExp;
+}
+
 export const PLAYER_CONSTRAINTS = {
   NICKNAME_MIN_LENGTH: 3,
   NICKNAME_MAX_LENGTH: 20,
-  NICKNAME_REGEX: /^[a-zA-Z0-9\s]+$/,
-  MAX_PENALTIES: 3,
-  DEFAULT_PENALTY_DURATION: 300000, // 5 minutes
+  NICKNAME_REGEX: /^[a-zA-Z0-9 ]+$/,
 } as const;
 
 export const DEFAULT_PLAYER_SETTINGS: PlayerSettings = {

@@ -3,7 +3,34 @@ export enum LobbyStatus {
   STARTING = 'starting',
   IN_GAME = 'in_game',
   COMPLETED = 'completed',
-  CLOSED = 'closed',
+}
+
+export interface Player {
+  id: string;
+  nickname: string;
+  sessionId: string;
+  currentLobby?: string;
+  currentGame?: string;
+  isReady: boolean;
+  joinTime: Date;
+  lastActivity: Date;
+  penalties: Penalty[];
+  settings: PlayerSettings;
+}
+
+export interface Penalty {
+  id: string;
+  type: 'quit_game' | 'timeout' | 'inappropriate_behavior';
+  startTime: Date;
+  endTime: Date;
+  reason: string;
+}
+
+export interface PlayerSettings {
+  enableSoundEffects: boolean;
+  enableNotifications: boolean;
+  preferredDifficulty: string;
+  gameTheme: string;
 }
 
 export interface Lobby {
@@ -12,52 +39,33 @@ export interface Lobby {
   isPrivate: boolean;
   joinCode?: string;
   ownerId: string;
-  players: string[]; // Player IDs
+  players: Player[];
   maxPlayers: number;
-  currentPlayerCount: number;
-  gameSettings: LobbyGameSettings;
+  gameSettings: GameSettings;
   status: LobbyStatus;
   createdAt: Date;
   lastActivity: Date;
-  gameId?: string;
 }
 
-export interface LobbyGameSettings {
-  maxRounds?: number;
-  questionsPerRound?: number;
-  questionTimeLimit?: number;
-  customTopics?: string[];
-  allowLateJoin?: boolean;
-  autoStart?: boolean;
-}
-
-export interface LobbyCreationRequest {
+export interface CreateLobbyRequest {
   name: string;
   isPrivate: boolean;
   maxPlayers?: number;
-  gameSettings?: LobbyGameSettings;
 }
 
-export interface LobbyJoinRequest {
+export interface JoinLobbyRequest {
   lobbyId: string;
   joinCode?: string;
   nickname: string;
 }
 
-export interface LobbyUpdateRequest {
-  name?: string;
-  gameSettings?: Partial<LobbyGameSettings>;
+export interface LobbyListResponse {
+  lobbies: Lobby[];
+  total: number;
 }
 
-export interface LobbyListItem {
-  id: string;
-  name: string;
-  currentPlayerCount: number;
-  maxPlayers: number;
-  status: LobbyStatus;
-  isPrivate: boolean;
-  createdAt: Date;
-}
+// Import GameSettings from game types
+import { GameSettings } from './game';
 
 export const LOBBY_CONSTRAINTS = {
   NAME_MIN_LENGTH: 3,

@@ -6,6 +6,10 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 
+// Import our handlers and routes
+import { setupSocketHandlers } from './handlers/socketHandlers';
+import lobbiesRouter from './routes/lobbies';
+
 // Load environment variables
 dotenv.config();
 
@@ -43,6 +47,9 @@ const io = new Server(server, {
   path: process.env.WS_PATH || '/socket.io',
 });
 
+// Setup WebSocket handlers
+setupSocketHandlers(io);
+
 // Basic health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -54,25 +61,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes placeholder
+// API routes
+app.use('/api/lobbies', lobbiesRouter);
+
 app.get('/api/status', (req, res) => {
   res.json({
     message: 'TrivAI Gaming Platform API is running',
     version: '0.1.0',
     environment: process.env.NODE_ENV || 'development',
-  });
-});
-
-// Socket.IO connection handling
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
-  socket.on('ping', () => {
-    socket.emit('pong');
-  });
-
-  socket.on('disconnect', (reason) => {
-    console.log('Client disconnected:', socket.id, 'Reason:', reason);
   });
 });
 
